@@ -1,6 +1,6 @@
 import { DatabaseSync } from "node:sqlite";
 
-const db = new DatabaseSync("coffee.db");
+const db = new DatabaseSync(process.env.DB_PATH ?? "coffee.db");
 
 db.exec(`
   CREATE TABLE IF NOT EXISTS prices (
