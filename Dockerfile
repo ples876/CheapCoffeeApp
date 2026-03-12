@@ -14,7 +14,8 @@ COPY api/package*.json ./api/
 RUN cd api && npm ci
 
 COPY api/ ./api/
+RUN cd api && npx tsc
 
 EXPOSE 3001
 
-CMD ["node", "--import", "tsx/esm", "api/src/index.ts"]
+CMD ["node", "api/dist/index.js"]
