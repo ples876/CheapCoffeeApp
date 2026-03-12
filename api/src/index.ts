@@ -9,6 +9,21 @@ const app = new Hono();
 
 app.use("*", cors({ origin: process.env.ALLOWED_ORIGIN ?? "*" }));
 
+// Global rate limit: 60 requests per IP per minute
+const requestCounts = new Map<string, { count: number; resetAt: number }>();
+app.use("*", (c, next) => {
+  const ip = c.req.header("x-forwarded-for") ?? "unknown";
+  const now = Date.now();
+  const entry = requestCounts.get(ip);
+  if (!entry || now > entry.resetAt) {
+    requestCounts.set(ip, { count: 1, resetAt: now + 60_000 });
+  } else {
+    entry.count++;
+    if (entry.count > 60) return c.json({ error: "Too many requests" }, 429);
+  }
+  return next();
+});
+
 const DRINK_TYPES = [
   "schwarzer_klein",
   "schwarzer_gross",
