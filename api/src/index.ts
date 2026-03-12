@@ -110,6 +110,6 @@ app.use("/*", serveStatic({ root: "./app/dist" }));
 // SPA fallback: all unmatched routes serve index.html
 app.get("/*", serveStatic({ path: "./app/dist/index.html" }));
 
-serve({ fetch: app.fetch, port: 3001 }, () => {
+serve({ fetch: app.fetch, port: 3001, hostname: "0.0.0.0" }, () => {
   console.log("API running on http://localhost:3001");
 });
