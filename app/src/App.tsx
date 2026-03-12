@@ -16,7 +16,12 @@ export default function App() {
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
       (pos) => setLocation({ lat: pos.coords.latitude, lon: pos.coords.longitude }),
-      () => setError("Standort konnte nicht ermittelt werden.")
+      (err) => {
+        if (err.code === 1)
+          setError("Standortzugriff verweigert. Bitte in den Browser-Einstellungen erlauben und Seite neu laden.");
+        else
+          setError("Standort nicht verfügbar. Bitte GPS aktivieren und Seite neu laden.");
+      }
     );
   }, []);
 
