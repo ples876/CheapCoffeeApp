@@ -1,12 +1,13 @@
 import { Hono } from "hono";
 import { serve } from "@hono/node-server";
+import { serveStatic } from "@hono/node-server/serve-static";
 import { cors } from "hono/cors";
 import { createHash } from "crypto";
 import db from "./db.js";
 
 const app = new Hono();
 
-app.use("*", cors());
+app.use("*", cors({ origin: process.env.ALLOWED_ORIGIN ?? "*" }));
 
 const DRINK_TYPES = [
   "schwarzer_klein",
@@ -102,6 +103,12 @@ app.post("/prices", async (c) => {
 
   return c.json({ ok: true }, 201);
 });
+
+// Serve built frontend (production only — in dev, Vite handles this)
+app.use("/*", serveStatic({ root: "./app/dist" }));
+
+// SPA fallback: all unmatched routes serve index.html
+app.get("/*", serveStatic({ path: "./app/dist/index.html" }));
 
 serve({ fetch: app.fetch, port: 3001 }, () => {
   console.log("API running on http://localhost:3001");

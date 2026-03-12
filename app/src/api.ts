@@ -1,14 +1,13 @@
 import type { OsmShop, PriceEntry } from "./types";
 
-const API = "http://localhost:3001";
 const OVERPASS = "https://overpass-api.de/api/interpreter";
 
-// Fetch nearby cafes from OpenStreetMap within ~5km radius
+// Fetch nearby cafes from OpenStreetMap within ~1km radius
 export async function fetchNearbyCafes(
   lat: number,
   lon: number
 ): Promise<OsmShop[]> {
-  const radius = 5000; // metres
+  const radius = 1000; // metres
   const query = `
     [out:json][timeout:10];
     (
@@ -39,7 +38,7 @@ export async function fetchNearbyCafes(
 
 export async function fetchPrices(osmIds: string[]): Promise<PriceEntry[]> {
   if (osmIds.length === 0) return [];
-  const res = await fetch(`${API}/prices?osm_ids=${osmIds.join(",")}`);
+  const res = await fetch(`/prices?osm_ids=${osmIds.join(",")}`);
   return res.json();
 }
 
@@ -51,7 +50,7 @@ export async function submitPrice(payload: {
   drink: string;
   price_eur: number;
 }): Promise<{ ok: boolean; error?: string }> {
-  const res = await fetch(`${API}/prices`, {
+  const res = await fetch(`/prices`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
