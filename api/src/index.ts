@@ -11,7 +11,7 @@ app.use("*", cors({ origin: process.env.ALLOWED_ORIGIN ?? "*" }));
 
 // Global rate limit: 60 requests per IP per minute
 const requestCounts = new Map<string, { count: number; resetAt: number }>();
-app.use("*", (c, next) => {
+app.use("*", async (c, next) => {
   const ip = c.req.header("x-forwarded-for") ?? "unknown";
   const now = Date.now();
   const entry = requestCounts.get(ip);
@@ -21,7 +21,7 @@ app.use("*", (c, next) => {
     entry.count++;
     if (entry.count > 60) return c.json({ error: "Too many requests" }, 429);
   }
-  return next();
+  await next();
 });
 
 const DRINK_TYPES = [
