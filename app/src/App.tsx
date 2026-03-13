@@ -37,7 +37,8 @@ export default function App() {
           setError("Standortzugriff verweigert. Bitte in den Browser-Einstellungen erlauben und Seite neu laden.");
         else
           setError("Standort nicht verfügbar. Bitte GPS aktivieren und Seite neu laden.");
-      }
+      },
+      { enableHighAccuracy: true, maximumAge: 0 }
     );
   }
 
