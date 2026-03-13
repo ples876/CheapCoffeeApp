@@ -26,6 +26,7 @@ export default function MapView({ location, shops, prices, onSelectShop }: Props
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
   const markersRef = useRef<L.CircleMarker[]>([]);
+  const userDotRef = useRef<L.CircleMarker | null>(null);
 
   // Init map once
   useEffect(() => {
@@ -40,8 +41,7 @@ export default function MapView({ location, shops, prices, onSelectShop }: Props
       attribution: "© OpenStreetMap contributors",
     }).addTo(mapRef.current);
 
-    // User location dot
-    L.circleMarker([location.lat, location.lon], {
+    userDotRef.current = L.circleMarker([location.lat, location.lon], {
       radius: 8,
       color: "#2980b9",
       fillColor: "#3498db",
@@ -50,6 +50,13 @@ export default function MapView({ location, shops, prices, onSelectShop }: Props
     })
       .addTo(mapRef.current)
       .bindTooltip("Du bist hier", { permanent: false });
+  }, []);
+
+  // Pan map and move user dot when location updates
+  useEffect(() => {
+    if (!mapRef.current) return;
+    mapRef.current.panTo([location.lat, location.lon]);
+    userDotRef.current?.setLatLng([location.lat, location.lon]);
   }, [location]);
 
   // Update shop markers whenever shops or prices change

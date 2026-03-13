@@ -13,38 +13,43 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  function locate() {
+    setLoading(true);
+    setError(null);
     navigator.geolocation.getCurrentPosition(
-      (pos) => setLocation({ lat: pos.coords.latitude, lon: pos.coords.longitude }),
+      async (pos) => {
+        const loc = { lat: pos.coords.latitude, lon: pos.coords.longitude };
+        setLocation(loc);
+        try {
+          const found = await fetchNearbyCafes(loc.lat, loc.lon);
+          setShops(found);
+          const priceData = await fetchPrices(found.map((s) => s.osm_id));
+          setPrices(priceData);
+        } catch {
+          setError("Cafés konnten nicht geladen werden.");
+        } finally {
+          setLoading(false);
+        }
+      },
       (err) => {
+        setLoading(false);
         if (err.code === 1)
           setError("Standortzugriff verweigert. Bitte in den Browser-Einstellungen erlauben und Seite neu laden.");
         else
           setError("Standort nicht verfügbar. Bitte GPS aktivieren und Seite neu laden.");
       }
     );
-  }, []);
+  }
 
-  useEffect(() => {
-    if (!location) return;
-    setLoading(true);
-    fetchNearbyCafes(location.lat, location.lon)
-      .then(async (found) => {
-        setShops(found);
-        const priceData = await fetchPrices(found.map((s) => s.osm_id));
-        setPrices(priceData);
-      })
-      .catch(() => setError("Cafés konnten nicht geladen werden."))
-      .finally(() => setLoading(false));
-  }, [location]);
+  useEffect(() => { locate(); }, []);
 
   function handlePriceSubmitted() {
     if (!shops.length) return;
     fetchPrices(shops.map((s) => s.osm_id)).then(setPrices);
   }
 
-  if (error) return <p className="status">{error}</p>;
-  if (!location || loading) return <p className="status">Lade…</p>;
+  if (error && !location) return <p className="status">{error}</p>;
+  if (!location) return <p className="status">Lade…</p>;
 
   return (
     <div className="map-container">
@@ -54,6 +59,10 @@ export default function App() {
         prices={prices}
         onSelectShop={setSelectedShop}
       />
+      <button className="refresh-btn" onClick={locate} disabled={loading} title="Standort aktualisieren">
+        {loading ? "…" : "↺"}
+      </button>
+      {error && <div className="map-error">{error}</div>}
       {selectedShop && (
         <PriceForm
           shop={selectedShop}
