@@ -22,6 +22,13 @@ function markerColor(price: number | null): string {
   return "#e74c3c";
 }
 
+function tooltipClass(color: string): string {
+  if (color === "#2ecc71") return "tt-green";
+  if (color === "#f1c40f") return "tt-yellow";
+  if (color === "#e74c3c") return "tt-red";
+  return "tt-gray";
+}
+
 const TOOLTIP_MIN_ZOOM = 17;
 
 export default function MapView({ location, shops, prices, onSelectShop }: Props) {
@@ -94,8 +101,16 @@ export default function MapView({ location, shops, prices, onSelectShop }: Props
         .bindTooltip(`<strong>${shop.name}</strong><br>${label}`, {
           permanent: true,
           direction: "top",
+          className: tooltipClass(color),
         })
         .on("click", () => onSelectShop(shop))
+        .on("tooltipopen", () => {
+          const el = marker.getTooltip()?.getElement();
+          if (el) {
+            el.style.cursor = "pointer";
+            el.onclick = () => onSelectShop(shop);
+          }
+        })
         .on("mouseover", () => marker.openTooltip())
         .on("mouseout", () => {
           if (mapRef.current!.getZoom() < TOOLTIP_MIN_ZOOM) marker.closeTooltip();

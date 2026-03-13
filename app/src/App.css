@@ -168,6 +168,16 @@
   cursor: default;
 }
 
+/* Tooltip color coding */
+.tt-green  { border-color: #27ae60 !important; }
+.tt-green.leaflet-tooltip-top::before  { border-top-color: #27ae60 !important; }
+.tt-yellow { border-color: #d4a017 !important; }
+.tt-yellow.leaflet-tooltip-top::before { border-top-color: #d4a017 !important; }
+.tt-red    { border-color: #c0392b !important; }
+.tt-red.leaflet-tooltip-top::before    { border-top-color: #c0392b !important; }
+.tt-gray   { border-color: #666 !important; }
+.tt-gray.leaflet-tooltip-top::before   { border-top-color: #666 !important; }
+
 .map-error {
   position: absolute;
   bottom: 1rem;
