@@ -17,17 +17,18 @@ function cheapestPrice(osmId: string, prices: PriceEntry[]): number | null {
 }
 
 function markerColor(price: number | null): string {
-  if (price === null) return "#888";
+  if (price === null) return "#607D8B";
   if (price < 2.5) return "#2ecc71";
   if (price < 3.5) return "#f1c40f";
   return "#e74c3c";
 }
 
-function tooltipClass(color: string): string {
-  if (color === "#2ecc71") return "tt-green";
-  if (color === "#f1c40f") return "tt-yellow";
-  if (color === "#e74c3c") return "tt-red";
-  return "tt-gray";
+function priceClass(color: string): string {
+  if (color === "#2ecc71") return "price-green";
+  if (color === "#f1c40f") return "price-yellow";
+  if (color === "#e74c3c") return "price-red";
+  if (color === "#607D8B") return "price-gray";
+  return "price-gray";
 }
 
 const TOOLTIP_MIN_ZOOM = 17;
@@ -95,22 +96,24 @@ export default function MapView({ location, shops, prices, flaggedIds, onSelectS
       const label = price != null ? `ab ${price.toFixed(2)} €` : "Kein Preis";
 
       const marker = L.circleMarker([shop.lat, shop.lon], {
-        radius: 10,
-        color,
+        radius: 8,
+        color: "#fff",
         fillColor: color,
-        fillOpacity: flagged ? 0.3 : 0.85,
+        fillOpacity: flagged ? 0.3 : 0.9,
         weight: 2,
       })
         .addTo(map)
         .on("click", () => onSelectShop(shop));
 
       if (!flagged) {
+        const tooltipHtml = `<span class="label-name">${shop.name}</span><span class="label-price ${priceClass(color)}">${label}</span>`;
         marker
-          .bindTooltip(`<strong>${shop.name}</strong><br>${label}`, {
+          .bindTooltip(tooltipHtml, {
             permanent: true,
             direction: "top",
-            className: tooltipClass(color),
+            className: "map-label",
             interactive: true,
+            offset: [0, -4],
           })
           .on("tooltipopen", () => {
             const el = marker.getTooltip()?.getElement();
