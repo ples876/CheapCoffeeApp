@@ -15,6 +15,9 @@ export async function fetchNearbyCafes(
       node["shop"="coffee"](around:${radius},${lat},${lon});
       node["shop"="bakery"](around:${radius},${lat},${lon});
       node["amenity"="bakery"](around:${radius},${lat},${lon});
+      node["shop"="kiosk"](around:${radius},${lat},${lon});
+      node["shop"="convenience"](around:${radius},${lat},${lon});
+      node["amenity"="fuel"](around:${radius},${lat},${lon});
     );
     out body;
   `;
