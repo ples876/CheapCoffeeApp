@@ -24,7 +24,7 @@ app.use("*", async (c, next) => {
   await next();
 });
 
-const DRINK_TYPES = ["schwarzer", "cappuccino", "espresso"] as const;
+const DRINK_TYPES = ["schwarz", "cappuccino", "espresso"] as const;
 
 // Rate limit: max 5 submissions per IP per day
 function isRateLimited(ipHash: string): boolean {

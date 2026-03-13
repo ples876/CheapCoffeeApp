@@ -1,7 +1,7 @@
-export type DrinkType = "schwarzer" | "cappuccino" | "espresso";
+export type DrinkType = "schwarz" | "cappuccino" | "espresso";
 
 export const DRINK_LABELS: Record<DrinkType, string> = {
-  schwarzer: "Schwarzer",
+  schwarz: "Schwarz",
   cappuccino: "Cappuccino",
   espresso: "Espresso",
 };

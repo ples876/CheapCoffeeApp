@@ -9,7 +9,7 @@ db.exec(`
     name         TEXT NOT NULL,
     lat          REAL NOT NULL,
     lon          REAL NOT NULL,
-    drink        TEXT NOT NULL CHECK(drink IN ('schwarzer', 'cappuccino', 'espresso')),
+    drink        TEXT NOT NULL CHECK(drink IN ('schwarz', 'cappuccino', 'espresso')),
     price_eur    REAL NOT NULL,
     ip_hash      TEXT NOT NULL,
     submitted_at TEXT NOT NULL DEFAULT (datetime('now'))

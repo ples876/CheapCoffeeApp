@@ -10,7 +10,7 @@ interface Props {
 }
 
 const DRINKS: { drink: DrinkType; label: string }[] = [
-  { drink: "schwarzer", label: "Schwarzer" },
+  { drink: "schwarz", label: "Schwarz" },
   { drink: "cappuccino", label: "Cappuccino" },
   { drink: "espresso", label: "Espresso" },
 ];
