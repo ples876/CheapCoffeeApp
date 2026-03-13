@@ -34,7 +34,7 @@ const DRINK_GROUPS = [
 ];
 
 export default function PriceForm({ shop, prices, onClose, onSubmitted }: Props) {
-  const [selectedDrink, setSelectedDrink] = useState<{ drink: DrinkType; size: string } | null>(null);
+  const [selectedDrink, setSelectedDrink] = useState<{ drink: DrinkType; label: string } | null>(null);
   const [price, setPrice] = useState("");
   const [status, setStatus] = useState<"idle" | "submitting" | "done" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
@@ -44,10 +44,10 @@ export default function PriceForm({ shop, prices, onClose, onSubmitted }: Props)
     return entry ? `${entry.price_eur.toFixed(2)} €` : "–";
   }
 
-  function openForm(drink: DrinkType, size: string) {
+  function openForm(drink: DrinkType, groupLabel: string, size: string) {
     const entry = prices.find((p) => p.osm_id === shop.osm_id && p.drink === drink);
     setPrice(entry ? entry.price_eur.toFixed(2).replace(".", ",") : "");
-    setSelectedDrink({ drink, size });
+    setSelectedDrink({ drink, label: `${groupLabel} ${size}` });
     setStatus("idle");
     setErrorMsg("");
   }
@@ -83,7 +83,7 @@ export default function PriceForm({ shop, prices, onClose, onSubmitted }: Props)
       <div className="modal">
         {selectedDrink ? (
           <>
-            <h2>{shop.name} · {selectedDrink.size}</h2>
+            <h2>{shop.name} · {selectedDrink.label}</h2>
             <form onSubmit={handleSubmit}>
               <label>
                 Preis (€)
@@ -119,7 +119,7 @@ export default function PriceForm({ shop, prices, onClose, onSubmitted }: Props)
                       <button
                         key={drink}
                         className="price-btn"
-                        onClick={() => openForm(drink, size)}
+                        onClick={() => openForm(drink, group.label, size)}
                       >
                         <span className="price-btn-size">{size}</span>
                         <span className="price-btn-value">{currentPrice(drink)}</span>
