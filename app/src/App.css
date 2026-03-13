@@ -169,6 +169,7 @@
 }
 
 /* Tooltip color coding */
+.tt-green, .tt-yellow, .tt-red, .tt-gray { border-width: 3px !important; }
 .tt-green  { border-color: #27ae60 !important; }
 .tt-green.leaflet-tooltip-top::before  { border-top-color: #27ae60 !important; }
 .tt-yellow { border-color: #d4a017 !important; }
