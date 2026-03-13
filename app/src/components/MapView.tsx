@@ -104,6 +104,7 @@ export default function MapView({ location, shops, prices, onSelectShop }: Props
           permanent: true,
           direction: "top",
           className: tooltipClass(color),
+          interactive: true,
         })
         .on("click", () => onSelectShop(shop))
         .on("tooltipopen", () => {
