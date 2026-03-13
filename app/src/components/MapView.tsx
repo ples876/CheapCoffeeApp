@@ -22,7 +22,7 @@ function markerColor(price: number | null): string {
   return "#e74c3c";
 }
 
-const TOOLTIP_MIN_ZOOM = 15;
+const TOOLTIP_MIN_ZOOM = 17;
 
 export default function MapView({ location, shops, prices, onSelectShop }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -95,7 +95,11 @@ export default function MapView({ location, shops, prices, onSelectShop }: Props
           permanent: true,
           direction: "top",
         })
-        .on("click", () => onSelectShop(shop));
+        .on("click", () => onSelectShop(shop))
+        .on("mouseover", () => marker.openTooltip())
+        .on("mouseout", () => {
+          if (mapRef.current!.getZoom() < TOOLTIP_MIN_ZOOM) marker.closeTooltip();
+        });
 
       if (map.getZoom() < TOOLTIP_MIN_ZOOM) marker.closeTooltip();
       markersRef.current.push(marker);
