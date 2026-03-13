@@ -12,6 +12,7 @@ export default function App() {
   const [selectedShop, setSelectedShop] = useState<OsmShop | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showHelp, setShowHelp] = useState(false);
 
   function locate() {
     setLoading(true);
@@ -63,7 +64,27 @@ export default function App() {
       <button className="refresh-btn" onClick={locate} disabled={loading} title="Standort aktualisieren">
         {loading ? "…" : "↺"}
       </button>
+      <button className="help-btn" onClick={() => setShowHelp(true)} title="Hilfe">?</button>
       {error && <div className="map-error">{error}</div>}
+      {showHelp && (
+        <div className="modal-backdrop" onClick={() => setShowHelp(false)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <h2>Was ist CheapCoffee?</h2>
+            <p>CheapCoffee zeigt dir, wo du in der Nähe günstig Kaffee bekommst – crowdgesourct von Leuten wie dir.</p>
+            <p>Die Pins auf der Karte sind farbkodiert:</p>
+            <ul>
+              <li><span className="legend-dot legend-green" /> unter 2,50 € – günstig</li>
+              <li><span className="legend-dot legend-yellow" /> 2,50–3,50 € – okay</li>
+              <li><span className="legend-dot legend-red" /> über 3,50 € – teuer</li>
+              <li><span className="legend-dot legend-gray" /> noch kein Preis</li>
+            </ul>
+            <p>Tippe auf einen Pin oder das Label, um Preise für Schwarzen, Cappuccino oder Espresso einzutragen oder zu aktualisieren.</p>
+            <div className="form-actions" style={{ marginTop: "1rem" }}>
+              <button type="button" onClick={() => setShowHelp(false)}>Schließen</button>
+            </div>
+          </div>
+        </div>
+      )}
       {selectedShop && (
         <PriceForm
           shop={selectedShop}

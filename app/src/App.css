@@ -149,6 +149,43 @@
   cursor: default;
 }
 
+.help-btn {
+  position: absolute;
+  top: 1rem;
+  right: 4rem;
+  z-index: 1000;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  border: none;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #555;
+}
+
+.modal h2 { margin-bottom: 0.75rem; }
+.modal p { font-size: 0.9rem; color: #444; margin-bottom: 0.5rem; }
+.modal ul { list-style: none; padding: 0; margin: 0 0 0.75rem; display: flex; flex-direction: column; gap: 0.3rem; }
+.modal li { display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; color: #444; }
+
+.legend-dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.legend-green  { background: #2ecc71; }
+.legend-yellow { background: #f1c40f; }
+.legend-red    { background: #e74c3c; }
+.legend-gray   { background: #888; }
+
 /* Tooltip color coding */
 .tt-green, .tt-yellow, .tt-red, .tt-gray { border-width: 2px !important; }
 .tt-green  { border-color: #2ecc71 !important; }
