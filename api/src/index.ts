@@ -41,7 +41,7 @@ function isRateLimited(ipHash: string): boolean {
        WHERE ip_hash = ? AND submitted_at >= datetime('now', '-1 day')`
     )
     .get(ipHash) as { count: number };
-  return row.count >= 5;
+  return row.count >= 30;
 }
 
 // Rate limit: max 1 submission per IP per shop per drink per 30 days
