@@ -22,6 +22,8 @@ function markerColor(price: number | null): string {
   return "#e74c3c";
 }
 
+const TOOLTIP_MIN_ZOOM = 15;
+
 export default function MapView({ location, shops, prices, onSelectShop }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
@@ -40,6 +42,14 @@ export default function MapView({ location, shops, prices, onSelectShop }: Props
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution: "© OpenStreetMap contributors",
     }).addTo(mapRef.current);
+
+    mapRef.current.on("zoomend", () => {
+      const zoom = mapRef.current!.getZoom();
+      markersRef.current.forEach((m) => {
+        if (zoom >= TOOLTIP_MIN_ZOOM) m.openTooltip();
+        else m.closeTooltip();
+      });
+    });
 
     userDotRef.current = L.circleMarker([location.lat, location.lon], {
       radius: 8,
@@ -87,6 +97,7 @@ export default function MapView({ location, shops, prices, onSelectShop }: Props
         })
         .on("click", () => onSelectShop(shop));
 
+      if (map.getZoom() < TOOLTIP_MIN_ZOOM) marker.closeTooltip();
       markersRef.current.push(marker);
     }
   }, [shops, prices, onSelectShop]);
