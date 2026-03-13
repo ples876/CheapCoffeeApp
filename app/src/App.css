@@ -11,6 +11,8 @@
   height: 100%;
   font-size: 1.2rem;
   color: #555;
+  padding: 2rem;
+  text-align: center;
 }
 
 /* Price form modal */
