@@ -66,6 +66,7 @@ export default function App() {
       {selectedShop && (
         <PriceForm
           shop={selectedShop}
+          prices={prices}
           onClose={() => setSelectedShop(null)}
           onSubmitted={handlePriceSubmitted}
         />
