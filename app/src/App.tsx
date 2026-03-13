@@ -69,8 +69,8 @@ export default function App() {
       {showHelp && (
         <div className="modal-backdrop" onClick={() => setShowHelp(false)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h2>Was ist CheapCoffee?</h2>
-            <p>CheapCoffee zeigt dir, wo du in der Nähe günstig Kaffee bekommst – crowdgesourct von Leuten wie dir.</p>
+            <h2>Was macht diese App?</h2>
+            <p>Hier siehst du immer, wo in deiner Nähe du günstig guten Kaffee bekommst – crowdgesourced von Leuten wie dir.</p>
             <p>Die Pins auf der Karte sind farbkodiert:</p>
             <ul>
               <li><span className="legend-dot legend-green" /> unter 2,50 € – günstig</li>
@@ -78,7 +78,7 @@ export default function App() {
               <li><span className="legend-dot legend-red" /> über 3,50 € – teuer</li>
               <li><span className="legend-dot legend-gray" /> noch kein Preis</li>
             </ul>
-            <p>Tippe auf einen Pin oder das Label, um Preise für Schwarzen, Cappuccino oder Espresso einzutragen oder zu aktualisieren.</p>
+            <p>Tippe auf einen Pin oder das Label, um Preise für schwarzen Kaffee, Cappuccino oder Espresso zu sehen und einzutragen oder zu aktualisieren. Der Preis sollte immer einfach der günstigste sein, unabhängig von der Größe.</p>
             <div className="form-actions" style={{ marginTop: "1rem" }}>
               <button type="button" onClick={() => setShowHelp(false)}>Schließen</button>
             </div>
