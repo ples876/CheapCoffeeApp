@@ -82,7 +82,7 @@ export default function MapView({ location, shops, prices, onSelectShop }: Props
       })
         .addTo(map)
         .bindTooltip(`<strong>${shop.name}</strong><br>${label}`, {
-          permanent: false,
+          permanent: true,
           direction: "top",
         })
         .on("click", () => onSelectShop(shop));
