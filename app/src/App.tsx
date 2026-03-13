@@ -22,8 +22,8 @@ export default function App() {
         setLocation(loc);
         try {
           const found = await fetchNearbyCafes(loc.lat, loc.lon);
-          setShops(found);
           const priceData = await fetchPrices(found.map((s) => s.osm_id));
+          setShops(found);
           setPrices(priceData);
         } catch {
           setError("Cafés konnten nicht geladen werden.");

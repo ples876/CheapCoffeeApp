@@ -71,10 +71,10 @@ export default function MapView({ location, shops, prices, onSelectShop }: Props
       .bindTooltip("Du bist hier", { permanent: false });
   }, []);
 
-  // Pan map and move user dot when location updates
+  // Center map and move user dot when location updates
   useEffect(() => {
     if (!mapRef.current) return;
-    mapRef.current.panTo([location.lat, location.lon]);
+    mapRef.current.setView([location.lat, location.lon], mapRef.current.getZoom(), { animate: false });
     userDotRef.current?.setLatLng([location.lat, location.lon]);
   }, [location]);
 
