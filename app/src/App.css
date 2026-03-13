@@ -212,3 +212,21 @@
   text-align: center;
   max-width: 90%;
 }
+
+.flag-btn {
+  display: block;
+  width: 100%;
+  margin-top: 0.75rem;
+  padding: 0.5rem;
+  font-size: 0.8rem;
+  color: #999;
+  background: none;
+  border: 1px dashed #ccc;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.flag-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}

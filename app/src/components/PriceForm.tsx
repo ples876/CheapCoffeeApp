@@ -1,12 +1,13 @@
 import { useState } from "react";
-import { submitPrice } from "../api";
+import { submitPrice, submitFlag, removeFlag } from "../api";
 import type { OsmShop, DrinkType, PriceEntry } from "../types";
 
 interface Props {
   shop: OsmShop;
   prices: PriceEntry[];
+  flagged: boolean;
   onClose: () => void;
-  onSubmitted: () => void;
+  onChanged: () => void;
 }
 
 const DRINKS: { drink: DrinkType; label: string }[] = [
@@ -15,7 +16,7 @@ const DRINKS: { drink: DrinkType; label: string }[] = [
   { drink: "espresso", label: "Espresso" },
 ];
 
-export default function PriceForm({ shop, prices, onClose, onSubmitted }: Props) {
+export default function PriceForm({ shop, prices, flagged, onClose, onChanged }: Props) {
   const [selectedDrink, setSelectedDrink] = useState<{ drink: DrinkType; label: string } | null>(null);
   const [price, setPrice] = useState("");
   const [status, setStatus] = useState<"idle" | "submitting" | "done" | "error">("idle");
@@ -52,7 +53,7 @@ export default function PriceForm({ shop, prices, onClose, onSubmitted }: Props)
 
     if (result.ok) {
       setStatus("done");
-      onSubmitted();
+      onChanged();
       setTimeout(() => setSelectedDrink(null), 800);
     } else {
       setStatus("error");
@@ -60,10 +61,40 @@ export default function PriceForm({ shop, prices, onClose, onSubmitted }: Props)
     }
   }
 
+  async function handleFlag() {
+    setStatus("submitting");
+    await submitFlag(shop.osm_id);
+    setStatus("idle");
+    onChanged();
+  }
+
+  async function handleUnflag() {
+    setStatus("submitting");
+    await removeFlag(shop.osm_id);
+    setStatus("idle");
+    onChanged();
+  }
+
   return (
     <div className="modal-backdrop" onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="modal">
-        {selectedDrink ? (
+        {flagged ? (
+          <>
+            <h2>{shop.name}</h2>
+            <p style={{ color: "#888" }}>Als „kein Kaffee-Verkauf" markiert.</p>
+            <div className="form-actions" style={{ marginTop: "1rem" }}>
+              <button type="button" onClick={onClose}>Schließen</button>
+              <button
+                type="button"
+                onClick={handleUnflag}
+                disabled={status === "submitting"}
+                style={{ background: "#2ecc71", color: "#fff", fontWeight: 600 }}
+              >
+                Doch, verkauft Kaffee
+              </button>
+            </div>
+          </>
+        ) : selectedDrink ? (
           <>
             <h2>{shop.name} · {selectedDrink.label}</h2>
             <form onSubmit={handleSubmit}>
@@ -107,6 +138,14 @@ export default function PriceForm({ shop, prices, onClose, onSubmitted }: Props)
             <div className="form-actions" style={{ marginTop: "1rem" }}>
               <button type="button" onClick={onClose}>Schließen</button>
             </div>
+            <button
+              type="button"
+              className="flag-btn"
+              onClick={handleFlag}
+              disabled={status === "submitting"}
+            >
+              Verkauft keinen Kaffee
+            </button>
           </>
         )}
       </div>

@@ -112,6 +112,62 @@ app.post("/prices", async (c) => {
   return c.json({ ok: true }, 201);
 });
 
+// GET /flags?osm_ids=123,456,789
+// Returns osm_ids that have been flagged as "no coffee"
+app.get("/flags", (c) => {
+  const raw = c.req.query("osm_ids") ?? "";
+  const osmIds = raw.split(",").filter(Boolean);
+
+  if (osmIds.length === 0) return c.json([]);
+
+  const placeholders = osmIds.map(() => "?").join(",");
+  const rows = db
+    .prepare(
+      `SELECT osm_id, COUNT(*) as count FROM flags
+       WHERE osm_id IN (${placeholders})
+       GROUP BY osm_id`
+    )
+    .all(...osmIds) as { osm_id: string; count: number }[];
+
+  return c.json(rows.map((r) => r.osm_id));
+});
+
+// POST /flags — flag a shop as not selling coffee
+app.post("/flags", async (c) => {
+  const ip = c.req.header("x-forwarded-for") ?? "unknown";
+  const ipHash = createHash("sha256").update(ip).digest("hex");
+
+  const body = await c.req.json();
+  const { osm_id } = body;
+  if (typeof osm_id !== "string" || !osm_id) {
+    return c.json({ error: "Missing osm_id" }, 400);
+  }
+
+  db.prepare(
+    `INSERT OR IGNORE INTO flags (osm_id, ip_hash) VALUES (?, ?)`
+  ).run(osm_id, ipHash);
+
+  return c.json({ ok: true }, 201);
+});
+
+// DELETE /flags — remove your flag from a shop
+app.delete("/flags", async (c) => {
+  const ip = c.req.header("x-forwarded-for") ?? "unknown";
+  const ipHash = createHash("sha256").update(ip).digest("hex");
+
+  const body = await c.req.json();
+  const { osm_id } = body;
+  if (typeof osm_id !== "string" || !osm_id) {
+    return c.json({ error: "Missing osm_id" }, 400);
+  }
+
+  db.prepare(
+    `DELETE FROM flags WHERE osm_id = ? AND ip_hash = ?`
+  ).run(osm_id, ipHash);
+
+  return c.json({ ok: true });
+});
+
 // Serve built frontend (production only — in dev, Vite handles this)
 app.use("/*", serveStatic({ root: "./app/dist" }));
 

@@ -7,6 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/prices": "http://localhost:3001",
+      "/flags": "http://localhost:3001",
     },
   },
 })

@@ -7,6 +7,7 @@ interface Props {
   location: { lat: number; lon: number };
   shops: OsmShop[];
   prices: PriceEntry[];
+  flaggedIds: string[];
   onSelectShop: (shop: OsmShop) => void;
 }
 
@@ -31,7 +32,7 @@ function tooltipClass(color: string): string {
 
 const TOOLTIP_MIN_ZOOM = 17;
 
-export default function MapView({ location, shops, prices, onSelectShop }: Props) {
+export default function MapView({ location, shops, prices, flaggedIds, onSelectShop }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
   const markersRef = useRef<L.CircleMarker[]>([]);
@@ -88,41 +89,47 @@ export default function MapView({ location, shops, prices, onSelectShop }: Props
     markersRef.current = [];
 
     for (const shop of shops) {
+      const flagged = flaggedIds.includes(shop.osm_id);
       const price = cheapestPrice(shop.osm_id, prices);
-      const color = markerColor(price);
+      const color = flagged ? "#ccc" : markerColor(price);
       const label = price != null ? `ab ${price.toFixed(2)} €` : "Kein Preis";
 
       const marker = L.circleMarker([shop.lat, shop.lon], {
         radius: 10,
         color,
         fillColor: color,
-        fillOpacity: 0.85,
+        fillOpacity: flagged ? 0.3 : 0.85,
         weight: 2,
       })
         .addTo(map)
-        .bindTooltip(`<strong>${shop.name}</strong><br>${label}`, {
-          permanent: true,
-          direction: "top",
-          className: tooltipClass(color),
-          interactive: true,
-        })
-        .on("click", () => onSelectShop(shop))
-        .on("tooltipopen", () => {
-          const el = marker.getTooltip()?.getElement();
-          if (el) {
-            el.style.cursor = "pointer";
-            el.onclick = () => onSelectShop(shop);
-          }
-        })
-        .on("mouseover", () => marker.openTooltip())
-        .on("mouseout", () => {
-          if (mapRef.current!.getZoom() < TOOLTIP_MIN_ZOOM) marker.closeTooltip();
-        });
+        .on("click", () => onSelectShop(shop));
 
-      if (map.getZoom() < TOOLTIP_MIN_ZOOM) marker.closeTooltip();
+      if (!flagged) {
+        marker
+          .bindTooltip(`<strong>${shop.name}</strong><br>${label}`, {
+            permanent: true,
+            direction: "top",
+            className: tooltipClass(color),
+            interactive: true,
+          })
+          .on("tooltipopen", () => {
+            const el = marker.getTooltip()?.getElement();
+            if (el) {
+              el.style.cursor = "pointer";
+              el.onclick = () => onSelectShop(shop);
+            }
+          })
+          .on("mouseover", () => marker.openTooltip())
+          .on("mouseout", () => {
+            if (mapRef.current!.getZoom() < TOOLTIP_MIN_ZOOM) marker.closeTooltip();
+          });
+
+        if (map.getZoom() < TOOLTIP_MIN_ZOOM) marker.closeTooltip();
+      }
+
       markersRef.current.push(marker);
     }
-  }, [shops, prices, onSelectShop]);
+  }, [shops, prices, flaggedIds, onSelectShop]);
 
   return <div ref={containerRef} style={{ width: "100%", height: "100%" }} />;
 }

@@ -45,6 +45,30 @@ export async function fetchPrices(osmIds: string[]): Promise<PriceEntry[]> {
   return res.json();
 }
 
+export async function fetchFlags(osmIds: string[]): Promise<string[]> {
+  if (osmIds.length === 0) return [];
+  const res = await fetch(`/flags?osm_ids=${osmIds.join(",")}`);
+  return res.json();
+}
+
+export async function submitFlag(osmId: string): Promise<{ ok: boolean; error?: string }> {
+  const res = await fetch(`/flags`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ osm_id: osmId }),
+  });
+  return res.json();
+}
+
+export async function removeFlag(osmId: string): Promise<{ ok: boolean; error?: string }> {
+  const res = await fetch(`/flags`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ osm_id: osmId }),
+  });
+  return res.json();
+}
+
 export async function submitPrice(payload: {
   osm_id: string;
   name: string;

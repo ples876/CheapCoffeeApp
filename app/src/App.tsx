@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { fetchNearbyCafes, fetchPrices } from "./api";
+import { fetchNearbyCafes, fetchPrices, fetchFlags } from "./api";
 import type { OsmShop, PriceEntry } from "./types";
 import MapView from "./components/MapView";
 import PriceForm from "./components/PriceForm";
@@ -9,6 +9,7 @@ export default function App() {
   const [location, setLocation] = useState<{ lat: number; lon: number } | null>(null);
   const [shops, setShops] = useState<OsmShop[]>([]);
   const [prices, setPrices] = useState<PriceEntry[]>([]);
+  const [flaggedIds, setFlaggedIds] = useState<string[]>([]);
   const [selectedShop, setSelectedShop] = useState<OsmShop | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -32,9 +33,14 @@ export default function App() {
         setLocation(loc);
         try {
           const found = await fetchNearbyCafes(loc.lat, loc.lon);
-          const priceData = await fetchPrices(found.map((s) => s.osm_id));
+          const ids = found.map((s) => s.osm_id);
+          const [priceData, flagData] = await Promise.all([
+            fetchPrices(ids),
+            fetchFlags(ids),
+          ]);
           setShops(found);
           setPrices(priceData);
+          setFlaggedIds(flagData);
         } catch {
           setError("Cafés konnten nicht geladen werden.");
         } finally {
@@ -57,9 +63,13 @@ export default function App() {
 
   useEffect(() => { locate(); }, []);
 
-  function handlePriceSubmitted() {
+  function handleDataChanged() {
     if (!shops.length) return;
-    fetchPrices(shops.map((s) => s.osm_id)).then(setPrices);
+    const ids = shops.map((s) => s.osm_id);
+    Promise.all([fetchPrices(ids), fetchFlags(ids)]).then(([p, f]) => {
+      setPrices(p);
+      setFlaggedIds(f);
+    });
   }
 
   if (error && !location) return <p className="status">{error}</p>;
@@ -71,6 +81,7 @@ export default function App() {
         location={location}
         shops={shops}
         prices={prices}
+        flaggedIds={flaggedIds}
         onSelectShop={setSelectedShop}
       />
       <button className="refresh-btn" onClick={locate} disabled={loading} title="Standort aktualisieren">
@@ -101,8 +112,9 @@ export default function App() {
         <PriceForm
           shop={selectedShop}
           prices={prices}
+          flagged={flaggedIds.includes(selectedShop.osm_id)}
           onClose={() => setSelectedShop(null)}
-          onSubmitted={handlePriceSubmitted}
+          onChanged={handleDataChanged}
         />
       )}
     </div>

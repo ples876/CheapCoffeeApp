@@ -17,6 +17,14 @@ db.exec(`
 
   CREATE INDEX IF NOT EXISTS idx_prices_osm_drink
     ON prices(osm_id, drink, submitted_at DESC);
+
+  CREATE TABLE IF NOT EXISTS flags (
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    osm_id       TEXT NOT NULL,
+    ip_hash      TEXT NOT NULL,
+    submitted_at TEXT NOT NULL DEFAULT (datetime('now')),
+    UNIQUE(osm_id, ip_hash)
+  );
 `);
 
 export default db;
