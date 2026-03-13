@@ -3,9 +3,7 @@ import { DatabaseSync } from "node:sqlite";
 const db = new DatabaseSync(process.env.DB_PATH ?? "coffee.db");
 
 db.exec(`
-  DROP TABLE IF EXISTS prices;
-
-  CREATE TABLE prices (
+  CREATE TABLE IF NOT EXISTS prices (
     id           INTEGER PRIMARY KEY AUTOINCREMENT,
     osm_id       TEXT NOT NULL,
     name         TEXT NOT NULL,
@@ -17,7 +15,7 @@ db.exec(`
     submitted_at TEXT NOT NULL DEFAULT (datetime('now'))
   );
 
-  CREATE INDEX idx_prices_osm_drink
+  CREATE INDEX IF NOT EXISTS idx_prices_osm_drink
     ON prices(osm_id, drink, submitted_at DESC);
 `);
 
