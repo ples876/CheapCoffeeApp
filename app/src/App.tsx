@@ -17,8 +17,17 @@ export default function App() {
   function locate() {
     setLoading(true);
     setError(null);
-    navigator.geolocation.getCurrentPosition(
+
+    // Use watchPosition to get a genuinely fresh GPS fix.
+    // getCurrentPosition often returns a stale cached position on mobile
+    // even with maximumAge:0 while the GPS hardware warms up.
+    let settled = false;
+    const watchId = navigator.geolocation.watchPosition(
       async (pos) => {
+        if (settled) return;
+        settled = true;
+        navigator.geolocation.clearWatch(watchId);
+
         const loc = { lat: pos.coords.latitude, lon: pos.coords.longitude };
         setLocation(loc);
         try {
@@ -33,13 +42,16 @@ export default function App() {
         }
       },
       (err) => {
+        if (settled) return;
+        settled = true;
+        navigator.geolocation.clearWatch(watchId);
         setLoading(false);
         if (err.code === 1)
           setError("Standortzugriff verweigert. Bitte in den Browser-Einstellungen erlauben und Seite neu laden.");
         else
           setError("Standort nicht verfügbar. Bitte GPS aktivieren und Seite neu laden.");
       },
-      { enableHighAccuracy: true, maximumAge: 0 }
+      { enableHighAccuracy: true }
     );
   }
 
