@@ -9,28 +9,10 @@ interface Props {
   onSubmitted: () => void;
 }
 
-const DRINK_GROUPS = [
-  {
-    label: "Schwarzer",
-    variants: [
-      { drink: "schwarzer_klein" as DrinkType, size: "Klein" },
-      { drink: "schwarzer_gross" as DrinkType, size: "Groß" },
-    ],
-  },
-  {
-    label: "Cappuccino",
-    variants: [
-      { drink: "cappuccino_klein" as DrinkType, size: "Klein" },
-      { drink: "cappuccino_gross" as DrinkType, size: "Groß" },
-    ],
-  },
-  {
-    label: "Espresso",
-    variants: [
-      { drink: "espresso_einfach" as DrinkType, size: "Einfach" },
-      { drink: "espresso_doppelt" as DrinkType, size: "Doppelt" },
-    ],
-  },
+const DRINKS: { drink: DrinkType; label: string }[] = [
+  { drink: "schwarzer", label: "Schwarzer" },
+  { drink: "cappuccino", label: "Cappuccino" },
+  { drink: "espresso", label: "Espresso" },
 ];
 
 export default function PriceForm({ shop, prices, onClose, onSubmitted }: Props) {
@@ -44,10 +26,10 @@ export default function PriceForm({ shop, prices, onClose, onSubmitted }: Props)
     return entry ? `${entry.price_eur.toFixed(2)} €` : "–";
   }
 
-  function openForm(drink: DrinkType, groupLabel: string, size: string) {
+  function openForm(drink: DrinkType, label: string) {
     const entry = prices.find((p) => p.osm_id === shop.osm_id && p.drink === drink);
     setPrice(entry ? entry.price_eur.toFixed(2).replace(".", ",") : "");
-    setSelectedDrink({ drink, label: `${groupLabel} ${size}` });
+    setSelectedDrink({ drink, label });
     setStatus("idle");
     setErrorMsg("");
   }
@@ -111,22 +93,15 @@ export default function PriceForm({ shop, prices, onClose, onSubmitted }: Props)
           <>
             <h2>{shop.name}</h2>
             <div className="price-grid">
-              {DRINK_GROUPS.map((group) => (
-                <div key={group.label} className="price-row">
-                  <span className="price-row-label">{group.label}</span>
-                  <div className="price-row-btns">
-                    {group.variants.map(({ drink, size }) => (
-                      <button
-                        key={drink}
-                        className="price-btn"
-                        onClick={() => openForm(drink, group.label, size)}
-                      >
-                        <span className="price-btn-size">{size}</span>
-                        <span className="price-btn-value">{currentPrice(drink)}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
+              {DRINKS.map(({ drink, label }) => (
+                <button
+                  key={drink}
+                  className="price-btn"
+                  onClick={() => openForm(drink, label)}
+                >
+                  <span className="price-btn-size">{label}</span>
+                  <span className="price-btn-value">{currentPrice(drink)}</span>
+                </button>
               ))}
             </div>
             <div className="form-actions" style={{ marginTop: "1rem" }}>
